@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"reflect"
+	"time"
+	"unicode"
+)
 
 type Product struct {
 	ID            *int       `sql:"id" ignoreInsertUpdate:"true"`
@@ -49,4 +53,20 @@ type Sold struct {
 	CreatedAt   *time.Time `sql:"created_at"`
 	UpdatedAt   *time.Time `sql:"updated_at"`
 	Items       []SoldItem
+}
+
+func GetTableName(object interface{}) (tableName string) {
+	typeOf := reflect.TypeOf(object)
+
+	objectName := typeOf.Elem().Name()
+
+	for i, v := range objectName {
+		if unicode.IsUpper(v) && i != 0 {
+			tableName += "_"
+		}
+
+		tableName += string(unicode.ToLower(v))
+	}
+
+	return
 }

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/izacgaldino23/products-api/domain"
 )
 
 func main() {
@@ -11,7 +12,7 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(map[string]interface{}{
-			"status": "ok",
+			"status": domain.GetTableName(&domain.PurchasedItem{}),
 		})
 	})
 
