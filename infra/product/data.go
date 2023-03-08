@@ -3,14 +3,15 @@ package product
 import (
 	"github.com/izacgaldino23/products-api/config"
 	"github.com/izacgaldino23/products-api/domain"
+	"github.com/izacgaldino23/products-api/oops"
 	"github.com/izacgaldino23/products-api/utils"
 )
 
-type CandlePS struct {
+type ProductPS struct {
 	TX *config.Transaction
 }
 
-func (c *CandlePS) AddProduct(product *domain.Product) (id int64, err error) {
+func (c *ProductPS) AddProduct(product *domain.Product) (id int64, err error) {
 	valueMap, err := utils.ParseStructToMap(product)
 	if err != nil {
 		return
@@ -21,7 +22,7 @@ func (c *CandlePS) AddProduct(product *domain.Product) (id int64, err error) {
 		SetMap(valueMap).
 		Suffix("RETURNING id").
 		Scan(&id); err != nil {
-		return
+		return id, oops.Err(err)
 	}
 
 	return

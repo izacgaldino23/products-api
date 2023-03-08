@@ -33,7 +33,7 @@ func ParseStructToMap(m interface{}) (generatedMap map[string]interface{}, err e
 		if fieldName == "" {
 			err = errTagIsEmpty
 			return
-		} else if fieldName == "-" || ignore != "" {
+		} else if fieldName == "-" || ignore != "" || value.Elem().Field(i).IsNil() {
 			continue
 		}
 
@@ -50,16 +50,44 @@ func Validate[T any](s *T, c *fiber.Ctx) (err error) {
 	if err != nil {
 		msg := ""
 		for _, e := range err.(validator.ValidationErrors) {
-			// el.Field = err.Field()
-			// el.Tag = err.Tag()
-			// el.Value = err.Param()
+
 			msg += fmt.Sprintf("\nField %v is %v", e.Field(), e.Tag())
-			// fiber.err
+
 		}
 
 		err = fiber.NewError(http.StatusUnprocessableEntity, msg)
 
 		return
+	}
+
+	return
+}
+
+func Convert(in any, out any) (err error) {
+	var (
+		tagIn      = "json"
+		tagOut     = "sql"
+		valueOfIn  = reflect.ValueOf(in)
+		valueOfOut = reflect.ValueOf(out)
+		typeOfIn   = reflect.TypeOf(in)
+		typeOfOut  = reflect.TypeOf(out)
+	)
+
+	if valueOfIn.IsNil() || valueOfIn.Kind() != reflect.Pointer {
+		return errors.New("In value is nil or not a pointer")
+	}
+
+	if valueOfOut.IsNil() || valueOfIn.Kind() != reflect.Pointer {
+		return errors.New("Out value is nil or not a pointer")
+	}
+
+	for i := 0; i < valueOfIn.Elem().NumField(); i++ {
+		for j := 0; j < valueOfOut.Elem().NumField(); j++ {
+			if typeOfIn.Elem().Field(i).Tag.Get(tagIn) == typeOfOut.Elem().Field(j).Tag.Get(tagOut) {
+				valueOfOut.Elem().Field(i).Set(valueOfIn.Elem().Field(i))
+				break
+			}
+		}
 	}
 
 	return
