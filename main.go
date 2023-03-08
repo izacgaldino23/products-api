@@ -9,9 +9,22 @@ import (
 	goerrors "github.com/go-errors/errors"
 	"github.com/gofiber/fiber/v2"
 	arrayfuncs "github.com/izacgaldino23/array-funcs"
+	"github.com/izacgaldino23/products-api/config"
 	"github.com/izacgaldino23/products-api/handler/product"
 	"github.com/izacgaldino23/products-api/utils"
 )
+
+func init() {
+	err := config.LoadEnvironment()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = config.OpenConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
 	app := fiber.New(fiber.Config{

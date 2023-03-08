@@ -8,16 +8,12 @@ import (
 )
 
 type Config struct {
-	BinanceEndpoint string `name:"BINANCE_ENDPOINT"`
-	APIKey          string `name:"API_KEY"`
-	APISecret       string `name:"API_SECRET"`
-
 	Database *Database `name:"DATABASE"`
 }
 
 type Database struct {
 	Host     string `name:"HOST"`
-	Name     string `name:"DATABASE"`
+	Name     string `name:"NAME"`
 	Username string `name:"USERNAME"`
 	Password string `name:"PASSWORD"`
 	Port     string `name:"PORT"`
