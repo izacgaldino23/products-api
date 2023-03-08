@@ -14,14 +14,14 @@ func AddProduct(c *fiber.Ctx) (err error) {
 		product = &app.Product{}
 	)
 
-	err = c.BodyParser(product)
+	err = utils.Validate(product, c)
 	if err != nil {
 		return goerrors.Wrap(err, 0)
 	}
 
 	id, err := app.AddProduct(product)
 	if err != nil {
-		return
+		return goerrors.Wrap(err, 0)
 	}
 
 	return c.JSON(utils.T{

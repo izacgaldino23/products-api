@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"net/http"
 	"strings"
 
 	goerrors "github.com/go-errors/errors"
@@ -50,34 +51,39 @@ func handleError(ctx *fiber.Ctx, err error) error {
 	}
 
 	if err != nil {
-		stack := err.(*goerrors.Error).ErrorStack()
+		errorMessage := utils.T{
+			"error": err.Error(),
+		}
 
-		stackColor := arrayfuncs.AnyToArrayKind(strings.Split(stack, "\n"))
+		if code != http.StatusUnprocessableEntity {
+			stack := err.(*goerrors.Error).ErrorStack()
 
-		stackColor.ForEach(func(line string, i int, a *[]string) {
-			if strings.Contains(line, " (") {
-				sentences := strings.Split(line, " ")
+			stackColor := arrayfuncs.AnyToArrayKind(strings.Split(stack, "\n"))
 
-				sentences[0] = utils.Colorize(utils.Red, sentences[0])
-				sentences[1] = utils.Colorize(utils.Gray, sentences[1])
+			stackColor.ForEach(func(line string, i int, a *[]string) {
+				if strings.Contains(line, " (") {
+					sentences := strings.Split(line, " ")
 
-				print(sentences[0], " ")
-				println(sentences[1])
+					sentences[0] = utils.Colorize(utils.Red, sentences[0])
+					sentences[1] = utils.Colorize(utils.Gray, sentences[1])
 
-				// line = strings.Join(sentences, " ")
-			} else if v := strings.TrimSpace(line); v != "" {
-				println(utils.Colorize(utils.Green, "   ->"), v)
-			}
-		})
+					print(sentences[0], " ")
+					println(sentences[1])
 
-		stack = strings.ReplaceAll(stack, "\t", "    ")
-		stack = strings.ReplaceAll(stack, "\n", "\n    ")
+					// line = strings.Join(sentences, " ")
+				} else if v := strings.TrimSpace(line); v != "" {
+					println(utils.Colorize(utils.Green, "   ->"), v)
+				}
+			})
+
+			stack = strings.ReplaceAll(stack, "\t", "    ")
+			stack = strings.ReplaceAll(stack, "\n", "\n    ")
+
+			errorMessage["stack"] = strings.Split(stack, "\n")
+		}
 
 		// In case the SendFile fails
-		return ctx.Status(code).JSON(utils.T{
-			"error": err.Error(),
-			"stack": strings.Split(stack, "\n"),
-		})
+		return ctx.Status(code).JSON(errorMessage)
 	}
 
 	// Return from handler
