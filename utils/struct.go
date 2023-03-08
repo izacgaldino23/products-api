@@ -9,11 +9,13 @@ var (
 	errTagIsEmpty = errors.New("The field doesn't have Tag")
 )
 
+type T map[string]interface{}
+
 func ParseStructToMap(m interface{}) (generatedMap map[string]interface{}, err error) {
 	var (
 		value         = reflect.ValueOf(m)
 		typeOf        = reflect.TypeOf(m)
-		tagName       = "column"
+		tagName       = "sql"
 		tagIgnoreName = "ignoreInsertUpdate"
 	)
 

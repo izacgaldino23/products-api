@@ -6,9 +6,15 @@ import (
 	"unicode"
 )
 
+type Entity[T any] struct {
+	Fields T
+}
+
 type Product struct {
 	ID            *int       `sql:"id" ignoreInsertUpdate:"true"`
 	Name          *string    `sql:"name"`
+	ImageURL      *string    `sql:"image_url"`
+	Link          *string    `sql:"link"`
 	LastBuyPrice  *float64   `sql:"last_buy_price"`
 	LastSellPrice *float64   `sql:"last_sell_price"`
 	CreatedAt     *time.Time `sql:"created_at"`
@@ -17,8 +23,6 @@ type Product struct {
 
 type PurchasedItem struct {
 	ID            *int       `sql:"id" ignoreInsertUpdate:"true"`
-	Link          *string    `sql:"link"`
-	ImageURL      *string    `sql:"image_url"`
 	ProductID     *int       `sql:"product_id"`
 	BuyPrice      *float64   `sql:"buy_price"`
 	Amount        *int       `sql:"amount"`
