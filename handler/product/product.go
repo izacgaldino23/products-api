@@ -1,8 +1,6 @@
 package product
 
 import (
-	"net/http"
-
 	goerrors "github.com/go-errors/errors"
 	"github.com/gofiber/fiber/v2"
 	app "github.com/izacgaldino23/products-api/application/product"
@@ -30,7 +28,9 @@ func AddProduct(c *fiber.Ctx) (err error) {
 }
 
 func ListProducts(c *fiber.Ctx) error {
+	params := utils.ParseParams(c)
+
 	return c.JSON(map[string]interface{}{
-		"status": http.StatusOK,
+		"params": params,
 	})
 }

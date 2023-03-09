@@ -1,14 +1,14 @@
 package product
 
 import (
-	"github.com/izacgaldino23/products-api/config"
+	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/domain"
 	"github.com/izacgaldino23/products-api/oops"
 	"github.com/izacgaldino23/products-api/utils"
 )
 
 type ProductPS struct {
-	TX *config.Transaction
+	TX *database.Transaction
 }
 
 func (c *ProductPS) AddProduct(product *domain.Product) (id int64, err error) {

@@ -1,4 +1,4 @@
-package config
+package database
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/izacgaldino23/products-api/config"
 	_ "github.com/lib/pq"
 )
 
@@ -25,7 +26,7 @@ func (t *Transaction) Rollback() {
 var DatabaseConnection *sql.DB
 
 func OpenConnection() (err error) {
-	connStr := fmt.Sprintf("postgresql://%v:%v@%v/%v?sslmode=disable", Environment.Database.Username, Environment.Database.Password, Environment.Database.Host, Environment.Database.Name)
+	connStr := fmt.Sprintf("postgresql://%v:%v@%v/%v?sslmode=disable", config.Environment.Database.Username, config.Environment.Database.Password, config.Environment.Database.Host, config.Environment.Database.Name)
 
 	DatabaseConnection, err = sql.Open("postgres", connStr)
 	if err != nil {

@@ -1,7 +1,7 @@
 package product
 
 import (
-	"github.com/izacgaldino23/products-api/config"
+	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/domain"
 	"github.com/izacgaldino23/products-api/infra/product"
 	"github.com/izacgaldino23/products-api/oops"
@@ -12,7 +12,7 @@ func AddProduct(newProduct *Product) (id int64, err error) {
 	// fmt.Println(*product)
 	const msg = "Error on add product"
 
-	tx, err := config.NewTransaction(false)
+	tx, err := database.NewTransaction(false)
 	if err != nil {
 		return id, oops.Wrap(err, msg)
 	}

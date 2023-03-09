@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/izacgaldino23/products-api/config"
+	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/handler/product"
 	"github.com/izacgaldino23/products-api/oops"
 )
@@ -15,7 +16,7 @@ func init() {
 		log.Fatal(err)
 	}
 
-	err = config.OpenConnection()
+	err = database.OpenConnection()
 	if err != nil {
 		log.Fatal(err)
 	}
