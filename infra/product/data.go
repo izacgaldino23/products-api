@@ -1,8 +1,6 @@
 package product
 
 import (
-	"fmt"
-
 	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/domain"
 	"github.com/izacgaldino23/products-api/oops"
@@ -54,8 +52,6 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 
 		query = query.Columns(columns...)
 	}
-
-	fmt.Println(query.ToSql())
 
 	rows, err := query.Query()
 	if err != nil {
