@@ -30,7 +30,10 @@ func AddProduct(c *fiber.Ctx) (err error) {
 func ListProducts(c *fiber.Ctx) error {
 	params := utils.ParseParams(c)
 
-	return c.JSON(map[string]interface{}{
-		"params": params,
-	})
+	products, err := app.ListProducts(&params)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	return c.JSON(products)
 }

@@ -59,6 +59,12 @@ type Sold struct {
 	Items       []SoldItem
 }
 
+type ProductList struct {
+	Products []Product
+	Next     bool
+	Count    int64
+}
+
 func GetTableName(object interface{}) (tableName string) {
 	typeOf := reflect.TypeOf(object)
 

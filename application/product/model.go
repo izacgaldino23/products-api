@@ -12,3 +12,9 @@ type Product struct {
 	CreatedAt     *time.Time `json:"created_at"`
 	UpdatedAt     *time.Time `json:"updated_at"`
 }
+
+type ProductList struct {
+	Products []Product `json:"products"`
+	Next     bool      `json:"next"`
+	Count    int64     `json:"count"`
+}

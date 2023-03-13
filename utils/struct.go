@@ -43,6 +43,30 @@ func ParseStructToMap(m interface{}) (generatedMap map[string]interface{}, err e
 	return
 }
 
+func GetSqlColumnList(m interface{}) (columns []string, err error) {
+	var (
+		typeOf  = reflect.TypeOf(m)
+		tagName = "sql"
+	)
+
+	columns = make([]string, 0)
+
+	for i := 0; i < typeOf.Elem().NumField(); i++ {
+		fieldName := typeOf.Elem().Field(i).Tag.Get(tagName)
+
+		if fieldName == "" {
+			err = errTagIsEmpty
+			return
+		} else if fieldName == "-" {
+			continue
+		}
+
+		columns = append(columns, fieldName)
+	}
+
+	return
+}
+
 func Validate[T any](s *T, c *fiber.Ctx) (err error) {
 	_ = c.BodyParser(s)
 

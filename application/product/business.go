@@ -9,7 +9,6 @@ import (
 )
 
 func AddProduct(newProduct *Product) (id int64, err error) {
-	// fmt.Println(*product)
 	const msg = "Error on add product"
 
 	tx, err := database.NewTransaction(false)
@@ -33,6 +32,38 @@ func AddProduct(newProduct *Product) (id int64, err error) {
 	if err = tx.Commit(); err != nil {
 		return id, oops.Wrap(err, msg)
 	}
+
+	return
+}
+
+func ListProducts(params *utils.QueryParamList) (out ProductList, err error) {
+	const msg = "Error on add product"
+
+	tx, err := database.NewTransaction(true)
+	if err != nil {
+		return out, oops.Wrap(err, msg)
+	}
+
+	var (
+		productInfra = product.ProductPS{TX: tx}
+		list         domain.ProductList
+	)
+
+	if list, err = productInfra.ListProducts(params); err != nil {
+		return out, oops.Wrap(err, msg)
+	}
+
+	out = ProductList{
+		Products: make([]Product, len(list.Products)),
+	}
+
+	for i := range list.Products {
+		if err = utils.Convert(&list.Products[i], &out.Products[i]); err != nil {
+			return out, oops.Wrap(err, msg)
+		}
+	}
+
+	out.Next, out.Count = list.Next, list.Count
 
 	return
 }
