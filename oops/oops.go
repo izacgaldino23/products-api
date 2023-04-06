@@ -33,6 +33,7 @@ func HandleError(ctx *fiber.Ctx, err error) error {
 		}
 
 		if code != http.StatusUnprocessableEntity {
+			err = errors.Errorf("%v", err)
 			stack := err.(*errors.Error).ErrorStack()
 
 			stackColor := arrayfuncs.AnyToArrayKind(strings.Split(stack, "\n"))
@@ -60,9 +61,10 @@ func HandleError(ctx *fiber.Ctx, err error) error {
 		}
 
 		// In case the SendFile fails
-		return ctx.Status(code).JSON(errorMessage)
+		ctx.Status(code).JSON(errorMessage)
+		return err
 	}
 
 	// Return from handler
-	return nil
+	return err
 }
