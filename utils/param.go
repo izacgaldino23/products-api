@@ -48,11 +48,14 @@ func (p *QueryParamList) HasKey(key string) bool {
 	return ok
 }
 
-func (p *QueryParamList) ParseToQuery(query *squirrel.SelectBuilder, filters map[string]Filter) (isTotal bool) {
+func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[string]Filter, object interface{}) (total int64, out []interface{}, err error) {
 	var (
 		totalTag  = "total"
 		sizeTag   = "size"
 		offsetTag = "offset"
+		columns   []string
+		fields    []any
+		isTotal   bool
 	)
 
 	query.PlaceholderFormat(squirrel.Question)
@@ -96,6 +99,44 @@ func (p *QueryParamList) ParseToQuery(query *squirrel.SelectBuilder, filters map
 	}
 
 	query.PlaceholderFormat(squirrel.Dollar)
+
+	if !isTotal {
+		columns, err = GetSqlColumnList(object)
+		if err != nil {
+			return
+		}
+
+		*query = query.Columns(columns...)
+	} else {
+		if err = query.QueryRow().Scan(&total); err != nil {
+			return
+		}
+
+		return
+	}
+
+	result, err := query.Query()
+	if err != nil {
+		return
+	}
+
+	out = make([]interface{}, 0)
+	for result.Next() {
+		fields, err = GetFieldList(object)
+		if err != nil {
+			return
+		}
+
+		if err = result.Scan(fields...); err != nil {
+			return
+		}
+
+		if err = FieldsToStruct(fields, object); err != nil {
+			return
+		}
+
+		out = append(out, object)
+	}
 
 	return
 }

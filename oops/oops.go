@@ -33,7 +33,7 @@ func HandleError(ctx *fiber.Ctx, err error) error {
 		}
 
 		if code != http.StatusUnprocessableEntity {
-			err = errors.Errorf("%v", err)
+			err = errors.Wrap(err, 0)
 			stack := err.(*errors.Error).ErrorStack()
 
 			stackColor := arrayfuncs.AnyToArrayKind(strings.Split(stack, "\n"))

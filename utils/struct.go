@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -67,6 +68,81 @@ func GetSqlColumnList(m interface{}) (columns []string, err error) {
 	return
 }
 
+func GetFieldList(m interface{}) (fields []any, err error) {
+	var (
+		typeOf  = reflect.TypeOf(m)
+		valueOf = reflect.ValueOf(m)
+		tagName = "sql"
+	)
+
+	for i := 0; i < typeOf.Elem().NumField(); i++ {
+		var (
+			fieldName = typeOf.Elem().Field(i).Tag.Get(tagName)
+			newField  reflect.Value
+			value     any
+		)
+
+		if fieldName == "" {
+			err = errTagIsEmpty
+			return
+		} else if fieldName == "-" {
+			continue
+		}
+		fieldType := valueOf.Elem().Field(i).Type()
+
+		switch valueOf.Elem().Field(i).Interface().(type) {
+		case time.Time:
+			newField = reflect.New(reflect.TypeOf(time.Now()))
+		default:
+			newField = reflect.New(fieldType)
+		}
+
+		value = newField.Elem().Interface()
+		fields = append(fields, &value)
+	}
+
+	return
+}
+
+func FieldsToStruct(fields []any, out interface{}) (err error) {
+	var (
+		tag        = "sql"
+		valueOfOut = reflect.ValueOf(out)
+		typeOfOut  = reflect.TypeOf(out)
+	)
+
+	if valueOfOut.IsNil() || valueOfOut.Kind() != reflect.Pointer {
+		return errors.New("Out value is nil or not a pointer")
+	}
+
+	for i := 0; i < valueOfOut.Elem().NumField(); i++ {
+		if typeOfOut.Elem().Field(i).Tag.Get(tag) != "" {
+
+			field := reflect.New(reflect.TypeOf(fields[i]).Elem())
+			field.Elem().Set(reflect.ValueOf(fields[i]))
+
+			if field.IsNil() {
+				continue
+			}
+
+			field = field.Elem().Elem().Elem()
+
+			if field.IsNil() {
+				continue
+			}
+			name := typeOfOut.Elem().Field(i).Name
+			switch value := field.Interface().(type) {
+			case time.Time:
+				valueOfOut.Elem().FieldByName(name).Set(reflect.ValueOf(value))
+			default:
+				valueOfOut.Elem().FieldByName(name).Set(reflect.ValueOf(value))
+			}
+		}
+	}
+
+	return
+}
+
 func Validate[T any](s *T, c *fiber.Ctx) (err error) {
 	_ = c.BodyParser(s)
 
@@ -101,7 +177,7 @@ func Convert(in any, out any) (err error) {
 		return errors.New("In value is nil or not a pointer")
 	}
 
-	if valueOfOut.IsNil() || valueOfIn.Kind() != reflect.Pointer {
+	if valueOfOut.IsNil() || valueOfOut.Kind() != reflect.Pointer {
 		return errors.New("Out value is nil or not a pointer")
 	}
 

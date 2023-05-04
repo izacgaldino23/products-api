@@ -31,44 +31,29 @@ func (c *ProductPS) AddProduct(product *domain.Product) (id int64, err error) {
 func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.ProductList, err error) {
 	var (
 		product = domain.Product{}
-		columns []string
+		total   int64
+		result  []interface{}
 	)
 
 	query := c.TX.Builder.
 		Select().From(domain.GetTableName(&product))
 
-	isTotal := params.ParseToQuery(&query, map[string]utils.Filter{
+	if total, result, err = params.MakeQuery(&query, map[string]utils.Filter{
 		"id":             utils.NewFilter("id", utils.FlagIn),
 		"name":           utils.NewFilter("name ilike '%:name%'", utils.FlagEq),
 		"created_at_lte": utils.NewFilter("created_at < :created_at::TIMESTAMPTZ", utils.FlagEq),
 		"created_at_gte": utils.NewFilter("created_at > :created_at::TIMESTAMPTZ", utils.FlagEq),
-	})
-
-	if !isTotal {
-		columns, err = utils.GetSqlColumnList(&product)
-		if err != nil {
-			return out, oops.Err(err)
-		}
-
-		query = query.Columns(columns...)
-	}
-
-	rows, err := query.Query()
-	if err != nil {
+	}, &product); err != nil {
 		return out, oops.Err(err)
 	}
 
 	out = domain.ProductList{
 		Products: []domain.Product{},
+		Count:    total,
 	}
 
-	for rows.Next() {
-		product = domain.Product{}
-		if err = rows.Scan(&product.ID, &product.Name, &product.ImageURL, &product.Link, &product.LastBuyPrice, &product.LastSellPrice, &product.CreatedAt, &product.UpdatedAt); err != nil {
-			return out, oops.Err(err)
-		}
-
-		out.Products = append(out.Products, product)
+	for i := range result {
+		out.Products = append(out.Products, *result[i].(*domain.Product))
 	}
 
 	return

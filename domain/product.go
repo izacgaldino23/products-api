@@ -11,28 +11,28 @@ type Entity[T any] struct {
 }
 
 type Product struct {
-	ID            *int       `sql:"id" ignoreInsertUpdate:"true"`
-	Name          *string    `sql:"name"`
-	ImageURL      *string    `sql:"image_url"`
-	Link          *string    `sql:"link"`
-	LastBuyPrice  *float64   `sql:"last_buy_price"`
-	LastSellPrice *float64   `sql:"last_sell_price"`
-	CreatedAt     *time.Time `sql:"created_at"`
-	UpdatedAt     *time.Time `sql:"updated_at"`
+	ID            int64     `sql:"id" ignoreInsertUpdate:"true"`
+	Name          string    `sql:"name"`
+	ImageURL      string    `sql:"image_url"`
+	Link          string    `sql:"link"`
+	LastBuyPrice  float64   `sql:"last_buy_price"`
+	LastSellPrice float64   `sql:"last_sell_price"`
+	CreatedAt     time.Time `sql:"created_at"`
+	UpdatedAt     time.Time `sql:"updated_at"`
 }
 
 type PurchasedItem struct {
-	ID            *int       `sql:"id" ignoreInsertUpdate:"true"`
-	ProductID     *int       `sql:"product_id"`
+	ID            *int64     `sql:"id" ignoreInsertUpdate:"true"`
+	ProductID     *int64     `sql:"product_id"`
 	BuyPrice      *float64   `sql:"buy_price"`
-	Amount        *int       `sql:"amount"`
-	SubItemAmount *int       `sql:"sub_item_amount"`
+	Amount        *int64     `sql:"amount"`
+	SubItemAmount *int64     `sql:"sub_item_amount"`
 	CreatedAt     *time.Time `sql:"created_at"`
 	UpdatedAt     *time.Time `sql:"updated_at"`
 }
 
 type Purchase struct {
-	ID          *int       `sql:"id" ignoreInsertUpdate:"true"`
+	ID          *int64     `sql:"id" ignoreInsertUpdate:"true"`
 	Supplier    *string    `sql:"supplier"`
 	Description *string    `sql:"description"`
 	CreatedAt   *time.Time `sql:"created_at"`
@@ -41,18 +41,18 @@ type Purchase struct {
 }
 
 type SoldItem struct {
-	ID        *int       `sql:"id" ignoreInsertUpdate:"true"`
-	ProductID *int       `sql:"product_id"`
+	ID        *int64     `sql:"id" ignoreInsertUpdate:"true"`
+	ProductID *int64     `sql:"product_id"`
 	SellPrice *float64   `sql:"sell_price"`
-	Amount    *int       `sql:"amount"`
+	Amount    *int64     `sql:"amount"`
 	Taxa      *float64   `sql:"taxa"`
 	CreatedAt *time.Time `sql:"created_at"`
 	UpdatedAt *time.Time `sql:"updated_at"`
 }
 
 type Sold struct {
-	ID          *int       `sql:"id" ignoreInsertUpdate:"true"`
-	PlatformID  *int       `sql:"platform_id"`
+	ID          *int64     `sql:"id" ignoreInsertUpdate:"true"`
+	PlatformID  *int64     `sql:"platform_id"`
 	Description *string    `sql:"description"`
 	CreatedAt   *time.Time `sql:"created_at"`
 	UpdatedAt   *time.Time `sql:"updated_at"`
