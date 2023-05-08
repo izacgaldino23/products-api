@@ -29,7 +29,10 @@ func main() {
 		ErrorHandler: oops.HandleError,
 	})
 
-	app.Use(recover.New())
+	app.Use(recover.New(recover.Config{
+		StackTraceHandler: oops.HandleErrorRecovery,
+		EnableStackTrace:  true,
+	}))
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(map[string]interface{}{
