@@ -11,14 +11,14 @@ type Entity[T any] struct {
 }
 
 type Product struct {
-	ID            int64     `sql:"id" ignoreInsertUpdate:"true"`
-	Name          string    `sql:"name"`
-	ImageURL      string    `sql:"image_url"`
-	Link          string    `sql:"link"`
-	LastBuyPrice  float64   `sql:"last_buy_price"`
-	LastSellPrice float64   `sql:"last_sell_price"`
-	CreatedAt     time.Time `sql:"created_at"`
-	UpdatedAt     time.Time `sql:"updated_at"`
+	ID            *int64     `sql:"id" ignoreInsertUpdate:"true"`
+	Name          *string    `sql:"name"`
+	ImageURL      *string    `sql:"image_url"`
+	Link          *string    `sql:"link"`
+	LastBuyPrice  *float64   `sql:"last_buy_price"`
+	LastSellPrice *float64   `sql:"last_sell_price"`
+	CreatedAt     *time.Time `sql:"created_at"`
+	UpdatedAt     *time.Time `sql:"updated_at"`
 }
 
 type PurchasedItem struct {

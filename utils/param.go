@@ -16,6 +16,8 @@ const (
 	FlagNotIn
 )
 
+const maxDefaultLimit int64 = 15
+
 type QueryParam []any
 
 type QueryParamList map[string]QueryParam
@@ -48,11 +50,12 @@ func (p *QueryParamList) HasKey(key string) bool {
 	return ok
 }
 
-func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[string]Filter, object interface{}) (total int64, out []interface{}, err error) {
+func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[string]Filter, object interface{}) (total int64, next bool, out []interface{}, err error) {
 	var (
 		totalTag  = "total"
 		sizeTag   = "size"
 		offsetTag = "offset"
+		limit     = maxDefaultLimit
 		columns   []string
 		fields    []any
 		isTotal   bool
@@ -65,7 +68,7 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 			*query = query.Column("count(*) as total")
 			isTotal = true
 		} else if i == sizeTag {
-			query.Limit(uint64(v.GetInt(0)))
+			limit = v.GetInt(0)
 		} else if i == offsetTag {
 			query.Offset(uint64(v.GetInt(0)))
 		} else {
@@ -98,7 +101,8 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 		}
 	}
 
-	query.PlaceholderFormat(squirrel.Dollar)
+	query.
+		PlaceholderFormat(squirrel.Dollar)
 
 	if !isTotal {
 		columns, err = GetSqlColumnList(object)
@@ -108,6 +112,8 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 
 		*query = query.Columns(columns...)
 	} else {
+		query.Limit(uint64(limit + 1))
+
 		if err = query.QueryRow().Scan(&total); err != nil {
 			return
 		}
@@ -121,7 +127,16 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 	}
 
 	out = make([]interface{}, 0)
+	var qtd int64
 	for result.Next() {
+		var (
+			newObject interface{}
+		)
+		if qtd == limit {
+			next = true
+			break
+		}
+
 		fields, err = GetFieldList(object)
 		if err != nil {
 			return
@@ -131,11 +146,12 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 			return
 		}
 
-		if err = FieldsToStruct(fields, object); err != nil {
+		if newObject, err = FieldsToStruct(fields, object); err != nil {
 			return
 		}
 
-		out = append(out, object)
+		out = append(out, newObject)
+		qtd++
 	}
 
 	return

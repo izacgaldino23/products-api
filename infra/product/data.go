@@ -32,13 +32,14 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 	var (
 		product = domain.Product{}
 		total   int64
+		next    bool
 		result  []interface{}
 	)
 
 	query := c.TX.Builder.
 		Select().From(domain.GetTableName(&product))
 
-	if total, result, err = params.MakeQuery(&query, map[string]utils.Filter{
+	if total, next, result, err = params.MakeQuery(&query, map[string]utils.Filter{
 		"id":             utils.NewFilter("id", utils.FlagIn),
 		"name":           utils.NewFilter("name ilike '%:name%'", utils.FlagEq),
 		"created_at_lte": utils.NewFilter("created_at < :created_at::TIMESTAMPTZ", utils.FlagEq),
@@ -50,6 +51,7 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 	out = domain.ProductList{
 		Products: []domain.Product{},
 		Count:    total,
+		Next:     next,
 	}
 
 	for i := range result {

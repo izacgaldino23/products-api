@@ -104,41 +104,46 @@ func GetFieldList(m interface{}) (fields []any, err error) {
 	return
 }
 
-func FieldsToStruct(fields []any, out interface{}) (err error) {
+func FieldsToStruct(fields []any, out interface{}) (newObject interface{}, err error) {
 	var (
 		tag        = "sql"
 		valueOfOut = reflect.ValueOf(out)
 		typeOfOut  = reflect.TypeOf(out)
+		newThing   = reflect.New(typeOfOut.Elem())
 	)
 
 	if valueOfOut.IsNil() || valueOfOut.Kind() != reflect.Pointer {
-		return errors.New("Out value is nil or not a pointer")
+		return newObject, errors.New("Out value is nil or not a pointer")
 	}
 
-	for i := 0; i < valueOfOut.Elem().NumField(); i++ {
+	for i := 0; i < newThing.Elem().NumField(); i++ {
 		if typeOfOut.Elem().Field(i).Tag.Get(tag) != "" {
-
-			field := reflect.New(reflect.TypeOf(fields[i]).Elem())
-			field.Elem().Set(reflect.ValueOf(fields[i]))
-
-			if field.IsNil() {
-				continue
-			}
-
-			field = field.Elem().Elem().Elem()
-
-			if field.IsNil() {
-				continue
-			}
+			temp := fields[i].(*interface{})
+			v := *temp
 			name := typeOfOut.Elem().Field(i).Name
-			switch value := field.Interface().(type) {
+
+			switch value := v.(type) {
 			case time.Time:
-				valueOfOut.Elem().FieldByName(name).Set(reflect.ValueOf(value))
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
+			case int64:
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
+			case int32:
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
+			case float32:
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
+			case float64:
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
+			case string:
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
+			case bool:
+				newThing.Elem().FieldByName(name).Set(reflect.ValueOf(&value))
 			default:
-				valueOfOut.Elem().FieldByName(name).Set(reflect.ValueOf(value))
+				// Nil value
 			}
 		}
 	}
+
+	newObject = newThing.Interface()
 
 	return
 }

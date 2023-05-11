@@ -79,11 +79,19 @@ func HandleError(ctx *fiber.Ctx, err error) error {
 
 func HandleErrorRecovery(ctx *fiber.Ctx, err interface{}) {
 	IsOnPanic = true
+	var msg string
 
-	formatStack()
+	switch e := err.(type) {
+	case string:
+		msg = e
+	default:
+		msg = err.(error).Error()
+	}
+
+	formatStack(msg)
 }
 
-func formatStack() {
+func formatStack(err string) {
 	var (
 		stackColor        = arrayfuncs.AnyToArrayKind(strings.Split(string(debug.Stack()), "\n"))
 		started, finished bool
@@ -91,7 +99,7 @@ func formatStack() {
 
 	stackColor.ForEach(func(line string, i int, a *[]string) {
 		if i == 0 {
-			println(utils.Colorize(utils.Purple, "IS ON PANIC"))
+			println(utils.Colorize(utils.Purple, "IS ON PANIC: "+err))
 			started = true
 		}
 
