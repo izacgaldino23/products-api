@@ -1,3 +1,4 @@
+// Package domain contains all models ans interfaces used under application
 package domain
 
 import (

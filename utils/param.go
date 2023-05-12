@@ -72,14 +72,15 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 	query.PlaceholderFormat(squirrel.Question)
 
 	for i, v := range *p {
-		if i == totalTag {
+		switch i {
+		case totalTag:
 			*query = query.Column("count(*) as total")
 			isTotal = true
-		} else if i == sizeTag {
+		case sizeTag:
 			limit = v.GetInt(0)
-		} else if i == offsetTag {
+		case offsetTag:
 			query.Offset(uint64(v.GetInt(0)))
-		} else {
+		default:
 			for j := range filters {
 				if j == i {
 					condition := strings.Replace(filters[j].Condition, ":"+i, "?", 1)

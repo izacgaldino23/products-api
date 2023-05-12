@@ -69,7 +69,7 @@ func HandleError(ctx *fiber.Ctx, err error) error {
 		}
 
 		// In case the SendFile fails
-		ctx.Status(code).JSON(errorMessage)
+		_ = ctx.Status(code).JSON(errorMessage)
 		return err
 	}
 

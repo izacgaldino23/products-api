@@ -26,7 +26,7 @@ func (t *Transaction) Rollback() {
 var DatabaseConnection *sql.DB
 
 func OpenConnection() (err error) {
-	connStr := fmt.Sprintf("postgresql://%v:%v@%v/%v?sslmode=disable", config.Environment.Database.Username, config.Environment.Database.Password, config.Environment.Database.Host, config.Environment.Database.Name)
+	connStr := fmt.Sprintf("postgresql://%v:%v@%v/%v?sslmode=disable", config.GetEnvironment().Database.Username, config.GetEnvironment().Database.Password, config.GetEnvironment().Database.Host, config.GetEnvironment().Database.Name)
 
 	DatabaseConnection, err = sql.Open("postgres", connStr)
 	if err != nil {
