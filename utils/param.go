@@ -14,6 +14,7 @@ const (
 	FlagNotEq
 	FlagIn
 	FlagNotIn
+	FlagNil
 )
 
 const maxDefaultLimit int64 = 15
@@ -30,6 +31,13 @@ type Filter struct {
 func (q *QueryParam) GetInt(index int) (value int64) {
 	temp := fmt.Sprintf("%v", (*q)[index])
 	value, _ = strconv.ParseInt(temp, 10, 64)
+
+	return
+}
+
+func (q *QueryParam) GetBol() (value bool) {
+	temp := fmt.Sprintf("%v", (*q)[0])
+	value, _ = strconv.ParseBool(temp)
 
 	return
 }
@@ -93,6 +101,16 @@ func (p *QueryParamList) MakeQuery(query *squirrel.SelectBuilder, filters map[st
 						*query = query.Where(squirrel.NotEq{
 							condition: v,
 						})
+					case FlagNil:
+						if !v.GetBol() {
+							*query = query.Where(squirrel.Eq{
+								condition: nil,
+							})
+						} else {
+							*query = query.Where(squirrel.NotEq{
+								condition: nil,
+							})
+						}
 					}
 
 					break

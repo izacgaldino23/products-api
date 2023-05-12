@@ -96,3 +96,26 @@ func UpdateProduct(id int64, productUpdate *Product) (err error) {
 
 	return
 }
+
+func DeleteProduct(id int64) (err error) {
+	const msg = "Error on delete product"
+
+	tx, err := database.NewTransaction(false)
+	if err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	var (
+		productInfra = product.ProductPS{TX: tx}
+	)
+
+	if err = productInfra.DeleteProduct(id); err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	return
+}

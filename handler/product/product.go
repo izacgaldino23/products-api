@@ -24,9 +24,10 @@ func AddProduct(c *fiber.Ctx) (err error) {
 		return goerrors.Wrap(err, 0)
 	}
 
-	return c.JSON(utils.T{
-		"id": id,
-	})
+	return c.Status(201).
+		JSON(utils.T{
+			"id": id,
+		})
 }
 
 func ListProducts(c *fiber.Ctx) error {
@@ -57,6 +58,24 @@ func UpdateProduct(c *fiber.Ctx) (err error) {
 	}
 
 	err = app.UpdateProduct(id, product)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	return c.SendStatus(204)
+}
+
+func DeleteProduct(c *fiber.Ctx) (err error) {
+	var (
+		id int64
+	)
+
+	id, err = strconv.ParseInt(c.Params("product_id"), 10, 64)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	err = app.DeleteProduct(id)
 	if err != nil {
 		return goerrors.Wrap(err, 0)
 	}

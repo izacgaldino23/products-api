@@ -20,6 +20,10 @@ func (c *ProductPS) UpdateProduct(product *domain.Product) (err error) {
 	return default_db.Update(product, *product.ID, c.TX)
 }
 
+func (c *ProductPS) DeleteProduct(id int64) (err error) {
+	return default_db.Delete(&domain.Product{}, id, c.TX)
+}
+
 func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.ProductList, err error) {
 	var (
 		product = domain.Product{}
@@ -27,6 +31,10 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 		next    bool
 		result  []interface{}
 	)
+
+	if !params.HasKey("removed") {
+		params.AddParam("removed", false)
+	}
 
 	query := c.TX.Builder.
 		Select().From(domain.GetTableName(&product))
@@ -36,6 +44,7 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 		"name":           utils.NewFilter("name ilike '%:name%'", utils.FlagEq),
 		"created_at_lte": utils.NewFilter("created_at < :created_at::TIMESTAMPTZ", utils.FlagEq),
 		"created_at_gte": utils.NewFilter("created_at > :created_at::TIMESTAMPTZ", utils.FlagEq),
+		"removed":        utils.NewFilter("removed_at", utils.FlagNil),
 	}, &product); err != nil {
 		return out, oops.Err(err)
 	}

@@ -41,3 +41,16 @@ func Update(object interface{}, id int64, tx *database.Transaction) (err error) 
 
 	return
 }
+
+func Delete(object interface{}, id int64, tx *database.Transaction) (err error) {
+	if err = tx.Builder.
+		Update(domain.GetTableName(object)).
+		Set("removed_at", "NOW()").
+		Where("id = ?", id).
+		Suffix("RETURNING id").
+		Scan(new(int64)); err != nil {
+		return oops.Err(err)
+	}
+
+	return
+}
