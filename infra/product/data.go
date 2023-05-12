@@ -60,3 +60,21 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 
 	return
 }
+
+func (c *ProductPS) UpdateProduct(product *domain.Product) (err error) {
+	valueMap, err := utils.ParseStructToMap(product)
+	if err != nil {
+		return
+	}
+
+	if err = c.TX.Builder.
+		Update(domain.GetTableName(product)).
+		SetMap(valueMap).
+		Where("id = ?", product.ID).
+		Suffix("RETURNING id").
+		Scan(new(int64)); err != nil {
+		return oops.Err(err)
+	}
+
+	return
+}

@@ -7,5 +7,5 @@ import (
 func Router(r fiber.Router) {
 	r.Post("/", AddProduct)
 	r.Get("/", ListProducts)
-	// r.Post("/", UpdateProduct)
+	r.Put("/:product_id", UpdateProduct)
 }

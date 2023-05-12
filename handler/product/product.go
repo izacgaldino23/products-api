@@ -1,6 +1,8 @@
 package product
 
 import (
+	"strconv"
+
 	goerrors "github.com/go-errors/errors"
 	"github.com/gofiber/fiber/v2"
 	app "github.com/izacgaldino23/products-api/application/product"
@@ -36,4 +38,28 @@ func ListProducts(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(products)
+}
+
+func UpdateProduct(c *fiber.Ctx) (err error) {
+	var (
+		product = &app.Product{}
+		id      int64
+	)
+
+	err = utils.Validate(product, c)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	id, err = strconv.ParseInt(c.Params("product_id"), 10, 64)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	err = app.UpdateProduct(id, product)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	return c.SendStatus(204)
 }

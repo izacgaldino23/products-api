@@ -67,3 +67,32 @@ func ListProducts(params *utils.QueryParamList) (out ProductList, err error) {
 
 	return
 }
+
+func UpdateProduct(id int64, productUpdate *Product) (err error) {
+	const msg = "Error on update product"
+
+	tx, err := database.NewTransaction(false)
+	if err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	var (
+		productInfra  = product.ProductPS{TX: tx}
+		productDomain = domain.Product{}
+	)
+
+	if err = utils.Convert(productUpdate, &productDomain); err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	productDomain.ID = &id
+	if err = productInfra.UpdateProduct(&productDomain); err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return oops.Wrap(err, msg)
+	}
+
+	return
+}
