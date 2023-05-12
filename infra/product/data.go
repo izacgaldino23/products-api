@@ -3,6 +3,7 @@ package product
 import (
 	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/domain"
+	"github.com/izacgaldino23/products-api/infra/default_db"
 	"github.com/izacgaldino23/products-api/oops"
 	"github.com/izacgaldino23/products-api/utils"
 )
@@ -12,20 +13,11 @@ type ProductPS struct {
 }
 
 func (c *ProductPS) AddProduct(product *domain.Product) (id int64, err error) {
-	valueMap, err := utils.ParseStructToMap(product)
-	if err != nil {
-		return
-	}
+	return default_db.Insert(product, c.TX)
+}
 
-	if err = c.TX.Builder.
-		Insert(domain.GetTableName(product)).
-		SetMap(valueMap).
-		Suffix("RETURNING id").
-		Scan(&id); err != nil {
-		return id, oops.Err(err)
-	}
-
-	return
+func (c *ProductPS) UpdateProduct(product *domain.Product) (err error) {
+	return default_db.Update(product, *product.ID, c.TX)
 }
 
 func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.ProductList, err error) {
@@ -56,24 +48,6 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 
 	for i := range result {
 		out.Products = append(out.Products, *result[i].(*domain.Product))
-	}
-
-	return
-}
-
-func (c *ProductPS) UpdateProduct(product *domain.Product) (err error) {
-	valueMap, err := utils.ParseStructToMap(product)
-	if err != nil {
-		return
-	}
-
-	if err = c.TX.Builder.
-		Update(domain.GetTableName(product)).
-		SetMap(valueMap).
-		Where("id = ?", product.ID).
-		Suffix("RETURNING id").
-		Scan(new(int64)); err != nil {
-		return oops.Err(err)
 	}
 
 	return
