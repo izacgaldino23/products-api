@@ -62,19 +62,18 @@ func HandleError(ctx *fiber.Ctx, err error) error {
 				}
 			})
 
-			stack = strings.ReplaceAll(stack, "\t", "    ")
-			stack = strings.ReplaceAll(stack, "\n", "\n    ")
+			// stack = strings.ReplaceAll(stack, "\t", "    ")
+			// stack = strings.ReplaceAll(stack, "\n", "\n    ")
 
-			errorMessage["stack"] = strings.Split(stack, "\n")
+			// errorMessage["stack"] = strings.Split(stack, "\n")
 		}
 
 		// In case the SendFile fails
 		_ = ctx.Status(code).JSON(errorMessage)
-		return err
 	}
 
 	// Return from handler
-	return err
+	return nil
 }
 
 func HandleErrorRecovery(ctx *fiber.Ctx, err interface{}) {

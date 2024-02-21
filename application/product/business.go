@@ -85,6 +85,10 @@ func GetProduct(id int64) (out Product, err error) {
 		return out, oops.Wrap(err, msg)
 	}
 
+	if productFromDB == nil {
+		return
+	}
+
 	if err = utils.Convert(productFromDB, &out, true); err != nil {
 		return out, oops.Wrap(err, msg)
 	}

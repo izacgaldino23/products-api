@@ -1,7 +1,10 @@
 package default_db
 
 import (
+	"database/sql"
+
 	"github.com/Masterminds/squirrel"
+	"github.com/gofiber/fiber/v2"
 	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/domain"
 	"github.com/izacgaldino23/products-api/oops"
@@ -71,6 +74,10 @@ func SelectByField[T interface{}](model T, field string, value any, tx *database
 	}
 
 	if err = result.Scan(fields...); err != nil {
+		if err == sql.ErrNoRows {
+			return newObject, fiber.NewError(fiber.StatusNotFound)
+		}
+
 		return newObject, oops.Err(err)
 	}
 
