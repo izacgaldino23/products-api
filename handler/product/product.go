@@ -41,6 +41,24 @@ func ListProducts(c *fiber.Ctx) error {
 	return c.JSON(products)
 }
 
+func GetProduct(c *fiber.Ctx) error {
+	var (
+		id int64
+	)
+
+	id, err := strconv.ParseInt(c.Params("product_id"), 10, 64)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	product, err := app.GetProduct(id)
+	if err != nil {
+		return goerrors.Wrap(err, 0)
+	}
+
+	return c.JSON(product)
+}
+
 func UpdateProduct(c *fiber.Ctx) (err error) {
 	var (
 		product = &app.Product{}

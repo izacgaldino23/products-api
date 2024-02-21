@@ -20,6 +20,7 @@ type Product struct {
 	LastSellPrice *float64   `sql:"last_sell_price"`
 	CreatedAt     *time.Time `sql:"created_at"`
 	UpdatedAt     *time.Time `sql:"updated_at"`
+	RemovedAt     *time.Time `sql:"removed_at"`
 }
 
 type PurchasedItem struct {

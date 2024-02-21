@@ -11,6 +11,7 @@ type Product struct {
 	LastSellPrice *float64   `json:"last_sell_price"`
 	CreatedAt     *time.Time `json:"created_at"`
 	UpdatedAt     *time.Time `json:"updated_at"`
+	// RemovedAt     *time.Time `json:"removed_at"`
 }
 
 type ProductList struct {

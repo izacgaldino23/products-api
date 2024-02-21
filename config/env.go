@@ -19,7 +19,7 @@ type Database struct {
 	Port     string `name:"PORT"`
 }
 
-var _Environment Config
+var Environment Config
 
 func LoadEnvironment() (err error) {
 	err = godotenv.Load()
@@ -27,14 +27,14 @@ func LoadEnvironment() (err error) {
 		return
 	}
 
-	_Environment.Database = &Database{}
-	scanStruct(&_Environment)
+	Environment.Database = &Database{}
+	scanStruct(&Environment)
 
 	return
 }
 
 func GetEnvironment() *Config {
-	return &_Environment
+	return &Environment
 }
 
 func scanStruct(envVar any, name ...string) {

@@ -1,6 +1,7 @@
 package default_db
 
 import (
+	"github.com/Masterminds/squirrel"
 	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/domain"
 	"github.com/izacgaldino23/products-api/oops"
@@ -51,6 +52,34 @@ func Delete(object interface{}, id int64, tx *database.Transaction) (err error) 
 		Scan(new(int64)); err != nil {
 		return oops.Err(err)
 	}
+
+	return
+}
+
+func SelectByField[T interface{}](model T, field string, value any, tx *database.Transaction) (newObject T, err error) {
+	result := tx.Builder.
+		Select("*").
+		From(domain.GetTableName(model)).
+		Where(squirrel.Eq{
+			field: value,
+		}).
+		Limit(1).QueryRow()
+
+	fields, err := utils.GetFieldList(model)
+	if err != nil {
+		return newObject, oops.Err(err)
+	}
+
+	if err = result.Scan(fields...); err != nil {
+		return newObject, oops.Err(err)
+	}
+
+	newObjectInterface, err := utils.FieldsToStruct(fields, model)
+	if err != nil {
+		return newObject, oops.Err(err)
+	}
+
+	newObject = newObjectInterface.(T)
 
 	return
 }

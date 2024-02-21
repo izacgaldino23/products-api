@@ -9,7 +9,8 @@ import (
 )
 
 type ProductPS struct {
-	TX *database.Transaction
+	TX    *database.Transaction
+	Model domain.Product
 }
 
 func (c *ProductPS) AddProduct(product *domain.Product) (id int64, err error) {
@@ -60,4 +61,8 @@ func (c *ProductPS) ListProducts(params *utils.QueryParamList) (out domain.Produ
 	}
 
 	return
+}
+
+func (c *ProductPS) GetProductByField(field string, value any) (*domain.Product, error) {
+	return default_db.SelectByField(&c.Model, field, value, c.TX)
 }

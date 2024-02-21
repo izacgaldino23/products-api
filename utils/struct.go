@@ -155,9 +155,7 @@ func Validate[T any](s *T, c *fiber.Ctx) (err error) {
 	if err != nil {
 		msg := ""
 		for _, e := range err.(validator.ValidationErrors) {
-
 			msg += fmt.Sprintf("\nField %v is %v", e.Field(), e.Tag())
-
 		}
 
 		err = fiber.NewError(http.StatusUnprocessableEntity, msg)
@@ -168,7 +166,7 @@ func Validate[T any](s *T, c *fiber.Ctx) (err error) {
 	return
 }
 
-func Convert(in any, out any) (err error) {
+func Convert(in any, out any, toJson bool) (err error) {
 	var (
 		tagIn      = "json"
 		tagOut     = "sql"
@@ -177,6 +175,11 @@ func Convert(in any, out any) (err error) {
 		typeOfIn   = reflect.TypeOf(in)
 		typeOfOut  = reflect.TypeOf(out)
 	)
+
+	if toJson {
+		tagIn = "sql"
+		tagOut = "json"
+	}
 
 	if valueOfIn.IsNil() || valueOfIn.Kind() != reflect.Pointer {
 		return errors.New("In value is nil or not a pointer")
@@ -188,8 +191,10 @@ func Convert(in any, out any) (err error) {
 
 	for i := 0; i < valueOfIn.Elem().NumField(); i++ {
 		for j := 0; j < valueOfOut.Elem().NumField(); j++ {
-			if typeOfIn.Elem().Field(i).Tag.Get(tagIn) == typeOfOut.Elem().Field(j).Tag.Get(tagOut) {
-				valueOfOut.Elem().Field(i).Set(valueOfIn.Elem().Field(i))
+			tagInValue := typeOfIn.Elem().Field(i).Tag.Get(tagIn)
+			tagOutValue := typeOfOut.Elem().Field(j).Tag.Get(tagOut)
+			if tagInValue == tagOutValue {
+				valueOfOut.Elem().Field(j).Set(valueOfIn.Elem().Field(i))
 				break
 			}
 		}

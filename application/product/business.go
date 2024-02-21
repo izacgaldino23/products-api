@@ -21,7 +21,7 @@ func AddProduct(newProduct *Product) (id int64, err error) {
 		productDomain = domain.Product{}
 	)
 
-	if err = utils.Convert(newProduct, &productDomain); err != nil {
+	if err = utils.Convert(newProduct, &productDomain, false); err != nil {
 		return id, oops.Wrap(err, msg)
 	}
 
@@ -58,12 +58,36 @@ func ListProducts(params *utils.QueryParamList) (out ProductList, err error) {
 	}
 
 	for i := range list.Products {
-		if err = utils.Convert(&list.Products[i], &out.Products[i]); err != nil {
+		if err = utils.Convert(&list.Products[i], &out.Products[i], true); err != nil {
 			return out, oops.Wrap(err, msg)
 		}
 	}
 
 	out.Next, out.Count = list.Next, list.Count
+
+	return
+}
+
+func GetProduct(id int64) (out Product, err error) {
+	const msg = "Error on get product"
+
+	tx, err := database.NewTransaction(true)
+	if err != nil {
+		return out, oops.Wrap(err, msg)
+	}
+
+	var (
+		productInfra  = product.ProductPS{TX: tx}
+		productFromDB *domain.Product
+	)
+
+	if productFromDB, err = productInfra.GetProductByField("id", id); err != nil {
+		return out, oops.Wrap(err, msg)
+	}
+
+	if err = utils.Convert(productFromDB, &out, true); err != nil {
+		return out, oops.Wrap(err, msg)
+	}
 
 	return
 }
@@ -81,7 +105,7 @@ func UpdateProduct(id int64, productUpdate *Product) (err error) {
 		productDomain = domain.Product{}
 	)
 
-	if err = utils.Convert(productUpdate, &productDomain); err != nil {
+	if err = utils.Convert(productUpdate, &productDomain, false); err != nil {
 		return oops.Wrap(err, msg)
 	}
 
