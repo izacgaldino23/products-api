@@ -1,0 +1,48 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Login Dockerhub
+      env:
+        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      
+    - name: Build the Docker image
+      run: docker build -t izacgaldino23/products-api .
+    - name: Push to Dockerhub
+      run: docker push izacgaldino23/products-api:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Set permissions for private key
+      run: |
+        echo "${{ secrets.AWS_PRIVATE_KEY }}" > key.pem
+        chmod 600 key.pem
+    - name: Pull Docker image
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker pull izacgaldino23/products-api:latest'
+    - name: Stop running container
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker stop cddemo || true'
+        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker rm cddemo || true'
+    - name: Run new container
+      run: |
+        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker run -d --name cddemo -p 80:3000 izacgaldino23/products-api:latest'
