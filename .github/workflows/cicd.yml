@@ -45,4 +45,4 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker rm cddemo || true'
     - name: Run new container
       run: |
-        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker run -d --name cddemo -p 80:3000 izacgaldino23/products-api:latest'
+        ssh -o StrictHostKeyChecking=no -i key.pem ubuntu@ec2-18-229-138-102.sa-east-1.compute.amazonaws.com 'sudo docker run -d --name cddemo -p 80:3030 izacgaldino23/products-api:latest'
