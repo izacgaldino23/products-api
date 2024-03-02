@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/izacgaldino23/products-api/config"
 	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/handler/product"
@@ -47,7 +47,7 @@ func main() {
 
 	handle(app)
 
-	err := app.Listen(":3030")
+	err := app.Listen(":8080")
 	if err != nil {
 		log.Fatal(err)
 	}

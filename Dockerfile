@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 RUN go mod download
 
-EXPOSE 3030
+EXPOSE 8080
 
 RUN go build -o /products-api .
 
@@ -19,6 +19,6 @@ WORKDIR /
 
 COPY --from=BuildStage /app/*.env /products-api /
 
-EXPOSE 3030
+EXPOSE 8080
 
 CMD [ "/products-api" ]
