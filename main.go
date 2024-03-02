@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/izacgaldino23/products-api/config"
 	"github.com/izacgaldino23/products-api/config/database"
 	"github.com/izacgaldino23/products-api/handler/product"
@@ -32,6 +33,10 @@ func main() {
 	app.Use(recover.New(recover.Config{
 		StackTraceHandler: oops.HandleErrorRecovery,
 		EnableStackTrace:  true,
+	}))
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
 	}))
 
 	app.Get("/", func(c *fiber.Ctx) error {

@@ -15,6 +15,7 @@ func AddProduct(newProduct *Product) (id int64, err error) {
 	if err != nil {
 		return id, oops.Wrap(err, msg)
 	}
+	defer tx.Rollback()
 
 	var (
 		productInfra  = product.ProductPS{TX: tx}
@@ -43,6 +44,7 @@ func ListProducts(params *utils.QueryParamList) (out ProductList, err error) {
 	if err != nil {
 		return out, oops.Wrap(err, msg)
 	}
+	defer tx.Rollback()
 
 	var (
 		productInfra = product.ProductPS{TX: tx}
@@ -75,6 +77,7 @@ func GetProduct(id int64) (out Product, err error) {
 	if err != nil {
 		return out, oops.Wrap(err, msg)
 	}
+	defer tx.Rollback()
 
 	var (
 		productInfra  = product.ProductPS{TX: tx}
@@ -103,6 +106,7 @@ func UpdateProduct(id int64, productUpdate *Product) (err error) {
 	if err != nil {
 		return oops.Wrap(err, msg)
 	}
+	defer tx.Rollback()
 
 	var (
 		productInfra  = product.ProductPS{TX: tx}
@@ -132,6 +136,7 @@ func DeleteProduct(id int64) (err error) {
 	if err != nil {
 		return oops.Wrap(err, msg)
 	}
+	defer tx.Rollback()
 
 	var (
 		productInfra = product.ProductPS{TX: tx}
