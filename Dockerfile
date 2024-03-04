@@ -20,8 +20,6 @@ WORKDIR /
 
 COPY --from=BuildStage /app/products-api /
 
-RUN ls -la
-
 EXPOSE 8080
 
 CMD [ "/products-api" ]

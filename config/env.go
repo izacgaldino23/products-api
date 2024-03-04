@@ -3,8 +3,6 @@ package config
 import (
 	"os"
 	"reflect"
-
-	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -22,10 +20,10 @@ type Database struct {
 var Environment Config
 
 func LoadEnvironment() (err error) {
-	err = godotenv.Load()
-	if err != nil {
-		return
-	}
+	// err = godotenv.Load()
+	// if err != nil {
+	// return
+	// }
 
 	Environment.Database = &Database{}
 	scanStruct(&Environment)
