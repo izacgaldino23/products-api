@@ -17,7 +17,7 @@ FROM scratch
 
 WORKDIR /
 
-COPY --from=BuildStage /app/env/prod/*.env /products-api /
+COPY --from=BuildStage /app/*.env /products-api /
 
 EXPOSE 8080
 
